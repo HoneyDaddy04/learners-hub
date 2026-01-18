@@ -1,0 +1,5 @@
+{
+  "name": "LCP - Learning Coordination Platform",
+  "description": "A centralized coordination and visibility layer for organizational learning, managing access pools, assignments, and learning history.",
+  "requestFramePermissions": []
+}
