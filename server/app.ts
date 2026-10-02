@@ -21,7 +21,8 @@ if (origins.length > 0) {
   app.use('/api/*', cors({ origin: origins, allowHeaders: ['Authorization', 'Content-Type'], allowMethods: ['GET', 'POST', 'PATCH', 'DELETE'] }));
 }
 
-app.get('/healthz', (c) => c.json({ ok: true }));
+// Not /healthz: Cloud Run reserves some paths ending in 'z'.
+app.get('/health', (c) => c.json({ ok: true }));
 
 const scoped = new Hono();
 scoped.use('*', requireMember);

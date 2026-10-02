@@ -3,7 +3,7 @@ import { app } from './app.js';
 
 describe('api app', () => {
   it('answers health checks without auth', async () => {
-    const res = await app.request('/healthz');
+    const res = await app.request('/health');
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
   });

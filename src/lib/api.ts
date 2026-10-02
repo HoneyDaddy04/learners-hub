@@ -2,6 +2,9 @@ import { auth } from './firebase';
 
 /** Same-origin by default: Vite proxies /api locally and Vercel rewrites it to Cloud Run in production. */
 const BASE = import.meta.env.VITE_API_BASE ?? '/api';
+// AI path building streams for minutes, longer than Vercel's proxy allows, so it can go
+// straight to Cloud Run (whose ALLOWED_ORIGINS must then include this site).
+const STREAM_BASE = import.meta.env.VITE_STREAM_API_BASE ?? BASE;
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -9,9 +12,9 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path: string, init: RequestInit = {}): Promise<Response> {
+async function request(path: string, init: RequestInit = {}, base = BASE): Promise<Response> {
   const token = await auth.currentUser?.getIdToken();
-  const res = await fetch(BASE + path, {
+  const res = await fetch(base + path, {
     ...init,
     headers: {
       ...(init.body ? { 'Content-Type': 'application/json' } : {}),
@@ -35,7 +38,7 @@ export const api = {
   delete: async <T = unknown>(path: string) => (await request(path, { method: 'DELETE' })).json() as Promise<T>,
   /** POST that streams newline-delimited JSON events back. */
   async stream<E>(path: string, body: unknown, onEvent: (e: E) => void): Promise<void> {
-    const res = await request(path, { method: 'POST', body: JSON.stringify(body) });
+    const res = await request(path, { method: 'POST', body: JSON.stringify(body) }, STREAM_BASE);
     const reader = res.body!.pipeThrough(new TextDecoderStream()).getReader();
     let buffer = '';
     for (;;) {

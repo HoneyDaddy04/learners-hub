@@ -20,6 +20,7 @@ gcloud run deploy "$SERVICE" \
   --region "$REGION" \
   --source . \
   --allow-unauthenticated \
+  --service-account "${SERVICE_ACCOUNT:-learners-hub-api@$PROJECT.iam.gserviceaccount.com}" \
   --add-cloudsql-instances "$INSTANCE" \
   --set-env-vars "^|^GCP_PROJECT=$PROJECT|GCP_LOCATION=$REGION|DB_SOCKET=/cloudsql/$INSTANCE|DB_USER=$DB_USER|DB_NAME=$DB_NAME|MIGRATE_ON_START=true|ALLOWED_ORIGINS=$ALLOWED_ORIGINS" \
   --set-secrets "DB_PASSWORD=$DB_PASSWORD_SECRET:latest,YOUTUBE_API_KEY=$YOUTUBE_SECRET:latest" \
@@ -30,5 +31,5 @@ gcloud run deploy "$SERVICE" \
 URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)')"
 echo
 echo "API deployed: $URL"
-echo "Health check: $(curl -fsS "$URL/healthz" || echo 'failed')"
+echo "Health check: $(curl -fsS "$URL/health" || echo 'failed')"
 echo "Put this URL in vercel.json (the /api rewrite) if it changed."
