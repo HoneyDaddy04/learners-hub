@@ -1,0 +1,8 @@
+.env*
+.npmrc
+node_modules
+dist
+dist-server
+server
+scripts
+Dockerfile

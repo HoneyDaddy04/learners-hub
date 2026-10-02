@@ -26,3 +26,6 @@ dist-ssr
 .env
 dist-server
 .npmrc
+
+.vercel
+.env*
